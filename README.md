@@ -18,8 +18,9 @@ To verify signature bundles in the browser, we port the official
 [`sigstore-go`](https://github.com/sigstore/sigstore-go/) 
 library to Web Assembly, embedding the Sigstore trust root.
 
-0. [Install Go](https://go.dev/doc/install) and `git clone` repo
-1. Download Sigstore TUF
+0. [Install Go](https://go.dev/doc/install)
+1. `git clone` repo and `cd` into repo
+2. Download Sigstore TUF
 ```
 curl -fsSL https://raw.githubusercontent.com/sigstore/root-signing/main/targets/trusted_root.json -o sigwasm/main/trusted_root.json
 ```
@@ -27,15 +28,15 @@ Alternatively, Sigstage TUF
 ```
 curl -fsSL https://raw.githubusercontent.com/sigstore/root-signing-staging/main/targets/trusted_root.json -o sigwasm/main/trusted_root.json
 ```
-2. Compile sigwasm
+3. Compile sigwasm
 ```
 cd sigwasm
 go mod tidy
 GOOS=js GOARCH=wasm CGO_ENABLED=0 go build -tags=purego -ldflags="-s -w" -o ../chrome-x/sigwasm/sigverify.wasm ./main
 ```
-3. Link Go's `wasm_exec.js`
+4. Link Go's `wasm_exec.js`
 ```
-ln -s $GOROOT/lib/wasm/wasm_exec.js chrome-x/sigwasm/wasm_exec.js
+ln -s $GOROOT/lib/wasm/wasm_exec.js ../chrome-x/sigwasm/wasm_exec.js
 ```
 
 ### Chrome Extension

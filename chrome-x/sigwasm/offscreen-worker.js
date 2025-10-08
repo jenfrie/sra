@@ -5,7 +5,7 @@ let wasmReady;
 
 self.onmessage = async (event) => {
 
-    result = await offscreenVerify(event.data);
+    result = await offscreenWorkerVerify(event.data);
 
 	postMessage(result);
 }

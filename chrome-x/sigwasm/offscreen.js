@@ -69,3 +69,14 @@ function dispatchQueuedTask() {
 
 	worker.run(data).then(resolve);
 }
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+	//ATTENTION: ALWAYS CHECK HERE IF ITS THE RIGHT REQUEST NOT IN THE FOLLOWING FUNCTION!!!!
+	if (message?.messageType === "OFFSCREEN_VERIFY") {
+		runTaskInPool(message.objToVerify).then(response => sendResponse(response));
+
+		return true;
+	}
+});
+
+initWorkerPool();

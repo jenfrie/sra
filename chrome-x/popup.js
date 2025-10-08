@@ -1,9 +1,5 @@
 document.getElementById("demo").innerHTML = "HELP"; // Shows that popup script is running but not correctly
 
-// Receives the parameter by Selenium if we test automatically. 
-// Needs to be removed if extension is not in development anymore.
-const URL_PARAMS  = new URLSearchParams(window.location.search);
-
 scriptNumber();
 
 // Adds summary received from the content script into the popup
@@ -48,36 +44,6 @@ async function getActiveTab() {
     currentWindow: true
   });
 
-  // Used for automated testing in Selenium, since Selenium opens the popup html in an seperate tab
-  // Needs to be removed if extension is not in development anymore.
-  if (URL_PARAMS.has("test")) {
-    const neighbourTab = await getNeighbourTabIdSequential(tabs[0].id);
-    
-    return neighbourTab;
-  }
-
   // The usual execution uses the Chrome tab of the active tab
   return tabs[0];
 }
-
-/**
- * Finds the left neighbour of given Chrome tab ID
- * @param {number} currentTabId - Chrome tab id of the popup HTML webpage
- * @returns The Chrome tab ID of its left neighbour. It should be the webpage in which the content script is running.
- * 
- * Needs to be removed if extension is not in development anymore.
- */
-async function getNeighbourTabIdSequential(currentTabId) {
-  // To Recieve the window ID and ID of the left neighbour we need the whole current tab
-  const currentTab = await chrome.tabs.get(currentTabId);
-  const windowId = currentTab.windowId;
-  // Left neighbour, since we open the test popup always to the right
-  const leftNeighborIndex = currentTab.index - 1;
-  // To get all tabs in the window
-  const tabs = await chrome.tabs.query({windowId: windowId});
-  // Find Chrome left neighbours' Chrome Tab
-  const leftNeighborTab = tabs.find(tab => tab.index === leftNeighborIndex);
-
-  return leftNeighborTab;
-}
-
