@@ -8,8 +8,6 @@ sub-resources (specifically `<script>` imports) on the basis of the
 Integrity (SRI) with a more easily maintained option, based on 
 a static OIDC identity, rather than brittle hash values.
 
-![Diagram](doc/diagram.png)
-
 ## Install
 
 ### Sigwasm
@@ -75,3 +73,9 @@ the email and OIDC issuer used to create the signature bundle.
 1. Host the signature bundle together with `example.js` at `path/to/example.js.sigstore.json`
 2. Open `demo.html` with extension installed
 3. Clicking the extension icon should show 1 successful validation
+
+### Evaluation Version
+
+The `chrome-x-eval` directory contains an evaluation version of the extension that performs a dummy validation for each external script found on a webpage. It measures various execution times and auto-downloads these as JSON.
+
+The dummy Sigstore bundle is currently hosted on AWS and hardcoded into the evaluation version. If testing locally, please change the dummy link to your own host.

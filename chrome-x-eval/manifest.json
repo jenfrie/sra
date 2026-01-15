@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "Sigwasm CACHE No-Block Extension",
+  "description": "Extension validating the integrity of scripts with the help of blobs from Sigstore. Additionally, it uses a session Cache.",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "notifications",
+    "storage",
+    "offscreen",
+    "downloads"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Block Extension",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sigwasm/offscreen.html",
+        "sigwasm/wasm_exec.js",
+        "sigwasm/sigverify.wasm"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ]
+}
