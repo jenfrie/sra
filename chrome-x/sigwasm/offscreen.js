@@ -28,10 +28,16 @@ class WasmWorker {
 	}
 }
 
-/**
- * Sets workers to run the new bundle format verification function in parallel,
- * since WebAssembly itself computes sequentially
- */
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+	if (message?.messageType === "OFFSCREEN_VERIFY") {
+		runTaskInPool(message.objToVerify).then(response => sendResponse(response));
+
+		return true;
+	}
+});
+
+initWorkerPool();
+
 function initWorkerPool() {
 	for (let i = 0; i < WORKER_COUNT; i++) {
 		const w = new WasmWorker(i);
@@ -40,11 +46,6 @@ function initWorkerPool() {
 	}
 }
 
-/**
- * Distributes new tasks to idle workers or stores them in a queue if all workers are busy
- * @param {object} data Data that the worker will evaluate. (In our case the combination of script, bundle, email and issuer)
- * @returns A promise to return the result of the evaluation 
- */
 function runTaskInPool(data) {
 	return new Promise((resolve) => {
 		const available = idleWorkers.shift();
@@ -57,10 +58,6 @@ function runTaskInPool(data) {
 
 }
 
-/**
- * Distributes an open task to idle workers. 
- * @returns undefined
- */
 function dispatchQueuedTask() {
 	if (taskQueue.length === 0 || idleWorkers.length === 0) return;
 
@@ -69,14 +66,3 @@ function dispatchQueuedTask() {
 
 	worker.run(data).then(resolve);
 }
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-	//ATTENTION: ALWAYS CHECK HERE IF ITS THE RIGHT REQUEST NOT IN THE FOLLOWING FUNCTION!!!!
-	if (message?.messageType === "OFFSCREEN_VERIFY") {
-		runTaskInPool(message.objToVerify).then(response => sendResponse(response));
-
-		return true;
-	}
-});
-
-initWorkerPool();

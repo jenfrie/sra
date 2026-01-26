@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Sigwasm CACHE No-Block Extension",
+  "name": "Sub-Resource Authenticity (SRA) - EVAL",
   "description": "Extension validating the integrity of scripts with the help of blobs from Sigstore. Additionally, it uses a session Cache.",
   "version": "1.0",
   "permissions": [
@@ -19,7 +19,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Block Extension",
+    "default_title": "SRA-EVAL",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "images/icon16.png",

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Sub-Resource Authenticity",
-  "description": "Extension validating the integrity of scripts with the help of bundles from Sigstore. Additionally, it blocks invalid scripts and uses a session cache.",
+  "name": "Sub-Resource Authenticity (SRA)",
+  "description": "Extension validating the integrity of scripts with the help of blobs from Sigstore. Additionally, it uses a persistent local Cache.",
   "version": "1.0",
   "permissions": [
     "activeTab",
@@ -18,7 +18,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Sub-Resource Authenticity",
+    "default_title": "SRA",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "images/icon16.png",
@@ -41,7 +41,7 @@
       "js": [
         "content.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_end"
     }
   ],
   "content_security_policy": {

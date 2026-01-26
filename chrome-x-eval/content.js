@@ -1,42 +1,36 @@
 const totalStartTime = performance.now() + performance.timeOrigin;
 
 const validScripts = [];
-const blockedScripts = [];
+const invalidScripts = [];
 const cachedScripts = [];
 
 let otherTotal = 0;
 
 const validScriptsTime = [];
-const blockedScriptsTime = [];
+const invalidScriptsTime = [];
 const cachedScriptsTime = [];
 
 let lastTimestamp = 0;
 let totalNumberOfScripts = 0;
 
-observer.observe(document.documentElement, {
-	childList: true,
-	subtree: true
-})
-
 if (document?.scripts) {
 	totalNumberOfScripts = document.scripts.length;
 
+	const pageOrigin = window.location.origin;
 
-        const pageOrigin = window.location.origin;
+	const thirdPartyScripts = Array.from(document.scripts).filter(s => {
+		if (!s?.src) return false;
+		if (!/^https?:\/\//i.test(s.src)) return false; 
 
-        const thirdPartyScripts = Array.from(document.scripts).filter(s => {
-          if (!s?.src) return false;
-          if (!/^https?:\/\//i.test(s.src)) return false;
+		try {
+		const u = new URL(s.src, pageOrigin);
+		return u.origin !== pageOrigin;
+		} catch {
+		return false;
+		}
+	});
 
-          try {
-            const u = new URL(s.src, pageOrigin);
-            return u.origin !== pageOrigin;
-          } catch {
-            return false;
-          }
-        });
-
-        checkAllScripts(thirdPartyScripts);
+	checkAllScripts(thirdPartyScripts);
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -83,6 +77,7 @@ async function checkAllScripts(activeScripts) {
 	});
 
 	sendScriptInfo({ messageType: "SCRIPT_NUMBER" });
+
 }
 
 async function scriptLoader(scriptPath, emailVerify, localStartTime) {
@@ -111,11 +106,11 @@ async function scriptLoader(scriptPath, emailVerify, localStartTime) {
 			}
 
 		} else {
-			blockedScripts.push({ src: scriptPath, dummy: emailVerify.dummy, email: emailVerify.email, issuer: emailVerify.issuer })
+			invalidScripts.push({ src: scriptPath, dummy: emailVerify.dummy, email: emailVerify.email, issuer: emailVerify.issuer })
 
 			const timeStamp = performance.now() + performance.timeOrigin;
 			lastTimestamp = timeStamp;
-			blockedScriptsTime.push({finished: timeStamp, scriptPath: scriptPath});
+			invalidScriptsTime.push({finished: timeStamp, scriptPath: scriptPath});
 		}
 
 		return { checked: true }
@@ -150,25 +145,16 @@ function sendScriptInfo(message) {
 		toJsonFile.cachedScriptsTime = cachedScriptsTime;
 
 		const address = window.location.href;
+
 		const filename = address.substring(address.lastIndexOf('/') + 1);
 
-                chrome.runtime.sendMessage({
-                  messageType: "DOWNLOAD_JSON",
-                    filename: "sigwasm_cache_no_block_" + filename + "_" + Math.trunc(totalStartTime) + ".json",
-                    payload: toJsonFile
-                });
 
+		chrome.runtime.sendMessage({
+			messageType: "DOWNLOAD_JSON",
+			filename: "sigwasm_cache_no_block_" + filename + "_" + Math.trunc(totalStartTime) + ".json",
+			payload: toJsonFile
+		});
 
 		return number;
 	}
-}
-
-function downloadObjectAsJson(exportObj, exportName) {
-	let dataStr = "data:text/json; charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-	let downloadAnchorNode = document.createElement("a");
-	downloadAnchorNode.setAttribute("href", dataStr);
-	downloadAnchorNode.setAttribute("download", exportName + ".json");
-	document.body.appendChild(downloadAnchorNode);
-	downloadAnchorNode.click();
-	downloadAnchorNode.remove();
 }
